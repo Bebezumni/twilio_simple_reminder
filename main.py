@@ -3,11 +3,12 @@ import datetime
 import schedule
 import time
 
-secret = 'Vp02w8WNwTkqt8SUe7FQhZ1kid7VEJr6'
+
 # Ваши учетные данные Twilio
-account_sid = 'AC10791ca87fbfdb4f8e60074a62c1ce6e'
-auth_token = '1fdffde9c17070ce1ce1e513de5c9367'
-twilio_number = '14243837806'
+secret = ''
+account_sid = ''
+auth_token = ''
+twilio_number = ''
 
 # Создаем клиент Twilio
 client = Client(account_sid, auth_token)
