@@ -2,10 +2,9 @@ from twilio.rest import Client
 import datetime
 import schedule
 import time
-
+from flask import Flask, request
 
 # Ваши учетные данные Twilio
-secret = ''
 account_sid = ''
 auth_token = ''
 twilio_number = ''
@@ -15,6 +14,28 @@ client = Client(account_sid, auth_token)
 
 # Список для хранения напоминаний
 reminders = []
+
+# Инициализируем фласк приложение
+app = Flask(__name__)
+
+#Создаем вебхук на фласке
+@app.route('/webhook', methods=['POST'])
+def handle_sms():
+    # Получаем данные запроса от Twilio
+    message_data = request.form
+    # Вызываем функцию incoming_message с данными сообщения
+    incoming_message(message_data)
+    # Возвращаем успешный ответ Twilio
+    return '', 200
+
+# Получаем текст и номер из сообщения
+def incoming_message(msg):
+    from_number = msg.from_
+    text = msg.body
+    handle_message(from_number, text)
+
+
+#Функция отправляющая конечное уведомление
 def send_reminder(to_number, text):
     message = client.messages.create(
         body=text,
@@ -23,6 +44,7 @@ def send_reminder(to_number, text):
     )
     print(f"Напоминание '{text}' отправлено на номер {to_number}")
 
+#Обработчик сообщений
 def handle_message(from_number, text):
     try:
         time_str, reminder_text = text.split(' ', 1)
@@ -33,19 +55,12 @@ def handle_message(from_number, text):
     except ValueError:
         send_reminder(from_number, "Неверный формат сообщения. Используйте: 'YYYY-MM-DD HH:MM Текст напоминания'")
 
-# Обработчик входящих сообщений от Twilio
-def incoming_message(msg):
-    from_number = msg.from_
-    text = msg.body
-    handle_message(from_number, text)
 
-# Создаем Twilio WebHook
-webhook = client.incoming_phone_numbers.list(
-    limit=1
-)[0].update(sms_url=f'http://example.com/handle_sms')
+# Говорим Twilio где наш вебхук WebHook
+webhook = client.incoming_phone_numbers.list(limit=1)[0].update(sms_url=f'http://SERVER_IP:5000/webhook')
 
-print("Бот запущен. Отправьте 'YYYY-MM-DD HH:MM Текст напоминания' для создания напоминания.")
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
