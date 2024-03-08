@@ -58,7 +58,7 @@ def handle_message(from_number, text):
 
 
 # Говорим Twilio где наш вебхук WebHook
-webhook = client.incoming_phone_numbers.list(limit=1)[0].update(sms_url=f'http://server_ip:5000/webhook')
+webhook = client.incoming_phone_numbers.list(limit=1)[0].update(sms_url=f'http://{server_ip}:5000/webhook')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
