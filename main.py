@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 #Создаем вебхук на фласке
 @app.route('/webhook', methods=['POST'])
-def handle_sms():
+def webhook_handler():
     # Получаем данные запроса от Twilio
     message_data = request.form
     # Вызываем функцию incoming_message с данными сообщения
